@@ -1,0 +1,6 @@
+/node_modules/
+/bld/
+
+/src/design/
+
+npm-debug.log

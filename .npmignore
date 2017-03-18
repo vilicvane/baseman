@@ -1,0 +1,11 @@
+/src/
+/typings/
+/test/
+
+/bld/design/
+/bld/test/
+
+/tsconfig.json
+/tslint.json
+
+.*

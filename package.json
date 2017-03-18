@@ -1,0 +1,50 @@
+{
+  "name": "baseman",
+  "version": "0.1.0",
+  "description": "Integration testing framework for Node.js",
+  "main": "bld/index.js",
+  "typings": "bld/index.d.ts",
+  "bin": {
+    "baseman": "bld/cli/index.js"
+  },
+  "scripts": {
+    "tsc": "tsc",
+    "tslint": "tslint",
+    "lint": "tslint src/**/*.ts -c tslint.json",
+    "build": "npm run lint && rimraf bld && tsc",
+    "pretest": "npm run build",
+    "test": "mocha",
+    "prepublish": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vilic/baseman.git"
+  },
+  "keywords": [
+    "integration",
+    "test",
+    "framework"
+  ],
+  "author": "vilicvane",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vilic/baseman/issues"
+  },
+  "homepage": "https://github.com/vilic/baseman",
+  "dependencies": {
+    "clime": "^0.5.0-dev.0",
+    "fs-extra": "^2.1.2",
+    "glob": "^7.1.1",
+    "tmp": "0.0.31"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^2.0.0",
+    "@types/glob": "^5.0.30",
+    "@types/node": "^7.0.5",
+    "@types/tmp": "0.0.32",
+    "rimraf": "^2.6.1",
+    "tslint": "^4.5.1",
+    "typescript": "^2.2.1",
+    "vts": "^0.1.0"
+  }
+}
