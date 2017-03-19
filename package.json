@@ -12,9 +12,7 @@
     "tslint": "tslint",
     "lint": "tslint src/**/*.ts -c tslint.json",
     "build": "npm run lint && rimraf bld && tsc",
-    "pretest": "npm run build",
-    "test": "mocha",
-    "prepublish": "npm test"
+    "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",
