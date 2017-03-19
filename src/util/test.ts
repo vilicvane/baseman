@@ -57,6 +57,12 @@ export async function run(
 }
 
 export async function accept(referenceDir: string, baselineDir: string): Promise<void> {
+  let referenceStats = await v.call(FSE.stat, referenceDir).catch(v.bear);
+
+  if (!referenceStats) {
+    throw new ExpectedError(`Reference directory "${referenceDir}" does not exist`);
+  }
+
   await v.call(FSE.remove, baselineDir).catch(v.bear);
   await v.call(FSE.move, referenceDir, baselineDir);
 }
