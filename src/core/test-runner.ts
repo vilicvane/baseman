@@ -14,7 +14,16 @@ export interface TestFilteredProgress {
   count: number;
 }
 
-export type TestRunnerRunProgress = TestLoadProgress | TestRunProgress | TestFilteredProgress;
+export interface TestCompletedProgress {
+  type: 'completed';
+}
+
+export type TestRunnerRunProgress =
+  TestLoadProgress |
+  TestRunProgress |
+  TestFilteredProgress |
+  TestCompletedProgress;
+
 export type TestRunnerRunOnProgress = (progress: TestRunnerRunProgress) => void;
 
 export interface TestRunnerOptions {
@@ -58,6 +67,8 @@ export class TestRunner {
         changed = true;
       }
     }
+
+    progress({ type: 'completed' });
 
     if (changed) {
       throw new ExpectedError('Output has changed, run `baseman accept` to accept the new output as baseline');

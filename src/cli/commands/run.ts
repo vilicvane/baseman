@@ -9,6 +9,7 @@ import {
   param,
 } from 'clime';
 
+import * as Chalk from 'chalk';
 import * as Tmp from 'tmp';
 
 import { print } from '../../internal-util';
@@ -55,17 +56,27 @@ export default class extends Command {
           print(`Filtered ${progress.count} test cases.`);
           break;
         case 'start-running':
-          print('Start running test cases...');
+          print('Start running test cases...\n');
           break;
         case 'running':
-          print(`Finished ${progress.done}/${progress.total}...`);
+          let changed = progress.lastCaseDiff !== undefined;
 
-          if (progress.lastCaseDiff !== undefined) {
-            print(`
-[The output of case "${progress.lastCaseId}" has changed]\n
-${progress.lastCaseDiff}\n`);
+          let doneStr = progress.done.toString();
+          let totalStr = progress.total.toString();
+
+          doneStr = new Array(totalStr.length - doneStr.length + 1).join(' ') + doneStr;
+
+
+          if (changed) {
+            print(`  ${Chalk.red(`[${doneStr}/${totalStr}] × ${progress.lastCaseId}`)}`);
+            print(`\n${progress.lastCaseDiff}\n`);
+          } else {
+            print(`  ${Chalk.gray(`[${doneStr}/${totalStr}]`)} ${Chalk.green('√')} ${progress.lastCaseId}`);
           }
 
+          break;
+        case 'completed':
+          print();
           break;
       }
     });
