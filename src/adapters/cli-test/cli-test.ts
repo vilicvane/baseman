@@ -16,7 +16,7 @@ import { isDirEmpty } from '../../internal-util';
 
 export interface CLITestCaseOptions {
   cwd?: string;
-  allowNonEmptyCwd?: boolean;
+  allowNonEmptyCWD?: boolean;
   /** Case contents to copy from */
   dir?: string;
 }
@@ -24,27 +24,37 @@ export interface CLITestCaseOptions {
 export class CLITestCase extends TestCase {
   owner: CLITest;
   cwd: string;
-  allowNonEmptyCwd: boolean;
+  allowNonEmptyCWD: boolean;
   dir: string | undefined;
+
+  private isCWDTemporary: boolean;
 
   constructor(
     id: string,
     public args: string[],
     {
-      cwd = Tmp.dirSync().name,
-      allowNonEmptyCwd = false,
+      cwd,
+      allowNonEmptyCWD = false,
       dir,
-    }: CLITestCaseOptions,
+    }: CLITestCaseOptions = {},
   ) {
     super(id);
-    this.cwd = cwd;
-    this.allowNonEmptyCwd = allowNonEmptyCwd;
+
+    if (cwd) {
+      this.cwd = cwd;
+      this.isCWDTemporary = false;
+    } else {
+      this.cwd = Tmp.dirSync().name;
+      this.isCWDTemporary = true;
+    }
+
+    this.allowNonEmptyCWD = allowNonEmptyCWD;
     this.dir = dir;
   }
 
   async test(): Promise<void> {
-    if (!this.allowNonEmptyCwd && !await isDirEmpty(this.cwd)) {
-      throw new ExpectedError(`Working directory "${this.cwd}" is not empty, set \`allowNonEmptyCwd\` option \
+    if (!this.allowNonEmptyCWD && !await isDirEmpty(this.cwd)) {
+      throw new ExpectedError(`Working directory "${this.cwd}" is not empty, set \`allowNonEmptyCWD\` option \
 to \`true\` explicitly to suppress this error`);
     }
 
@@ -72,21 +82,29 @@ to \`true\` explicitly to suppress this error`);
       [stdout, stderr] = this.extractOutput(stdout, stderr);
     }
 
+    let referencePath = this.referencePath;
+
+    await v.call(FSE.ensureDir, referencePath);
+
     if (stdout.length) {
-      let path = Path.join(this.referenceDir, '_stdout');
+      let path = Path.join(referencePath, '_stdout');
       await v.call(FSE.writeFile, path, stdout);
     }
 
     if (stderr.length) {
-      let path = Path.join(this.referenceDir, '_stderr');
+      let path = Path.join(referencePath, '_stderr');
       await v.call(FSE.writeFile, path, stderr);
     }
 
-    let exitCodePath = Path.join(this.referenceDir, '_code');
-    await v.call(FSE.writeFile, exitCodePath, `0x${code.toString(16)}`);
+    let exitCodePath = Path.join(referencePath, '_code');
+    await v.call(FSE.writeFile, exitCodePath, `0x${code.toString(16)}\n`);
 
     if (this.extractFileSystemOutput) {
       await this.extractFileSystemOutput();
+    }
+
+    if (this.isCWDTemporary) {
+      await v.call(FSE.remove, this.cwd).catch(v.bear);
     }
   }
 

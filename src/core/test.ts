@@ -8,61 +8,135 @@ import { Resolvable } from 'villa';
 import { TestCase } from './test-case';
 
 export interface TestOwner {
-  baselineDir: string;
-  referenceDir: string;
+  baselinePath: string;
+  referencePath: string;
 }
 
-export type TestCaseGeneratorProgressHandler = (done: number, total: number) => void;
-export type TestCaseGenerator<T extends TestCase> = (progress: TestCaseGeneratorProgressHandler) => Resolvable<T[]>;
-
-export interface TestOptions<T extends TestCase> {
-  generator: TestCaseGenerator<T>;
-  description?: string;
+export interface TestStartGeneratingProgress {
+  type: 'start-generating';
 }
+
+export interface TestGeneratingProgress {
+  type: 'generating';
+  done: number;
+  total: number;
+}
+
+export interface TestGeneratedProgress {
+  type: 'generated';
+  total: number;
+}
+
+export type TestLoadProgress =
+  TestStartGeneratingProgress |
+  TestGeneratingProgress |
+  TestGeneratedProgress;
+
+export type TestLoadOnProgress = (progress: TestLoadProgress) => void;
+
+export interface TestStartRunningProgress {
+  type: 'start-running';
+  total: number;
+}
+
+export interface TestRunningProgress {
+  type: 'running';
+  lastCaseId: string,
+  lastCaseDiff?: string;
+  done: number;
+  total: number;
+}
+
+export type TestRunProgress =
+  TestStartRunningProgress |
+  TestRunningProgress;
+
+export type TestRunOnProgress = (progress: TestRunProgress) => void;
+
+export type TestGenerateOnProgress = (done: number, total: number) => void;
 
 export abstract class Test<T extends TestCase> {
   owner: TestOwner;
 
-  private caseNameSet = new Set<string>();
-  private cases: T[] = [];
-  private testCaseGenerator: TestCaseGenerator<T>;
+  private cases: T[];
+  private loaded = false;
 
   constructor(
     public description?: string,
   ) { }
 
-  get referenceDir(): string {
+  get referencePath(): string {
     this.checkOwner();
-    return this.owner.referenceDir;
+    return this.owner.referencePath;
   }
 
-  get baselineDir(): string {
+  get baselinePath(): string {
     this.checkOwner();
-    return this.owner.baselineDir;
+    return this.owner.baselinePath;
   }
 
-  abstract generate(progress?: TestCaseGeneratorProgressHandler): Resolvable<void>;
-
-  async run(): Promise<void> {
-    for (let testCase of this.cases) {
-      await testCase.test();
+  async load(progress: TestLoadOnProgress): Promise<void> {
+    if (this.loaded) {
+      return;
     }
-  }
 
-  protected add(cases: T[]): void {
-    let caseNameSet = this.caseNameSet;
+    progress({ type: 'start-generating' });
+
+    let cases = await this.generate((done, total) => progress({
+      type: 'generating',
+      done,
+      total,
+    }));
 
     for (let testCase of cases) {
-      if (caseNameSet.has(testCase.id)) {
-        throw new Error(`Duplicate test case name "${testCase.id}"`);
-      }
-
-      caseNameSet.add(testCase.id);
       testCase.owner = this;
     }
 
-    this.cases.push(...cases);
+    this.cases = cases;
+
+    progress({ type: 'generated', total: cases.length });
+
+    this.loaded = true;
   }
+
+  /**
+   * @returns A boolean indicates whether this test passes.
+   */
+  async run(progress: TestRunOnProgress): Promise<boolean> {
+    if (!this.loaded) {
+      throw new Error('Test has not yet been loaded');
+    }
+
+    let cases = this.cases;
+    let total = cases.length;
+
+    progress({ type: 'start-running', total });
+
+    let passed = true;
+
+    for (let [index, testCase] of cases.entries()) {
+      await testCase.clean();
+      await testCase.test();
+
+      let diff = await testCase.diff();
+
+      if (passed && diff !== undefined) {
+        passed = false;
+      }
+
+      progress({
+        type: 'running',
+        lastCaseId: testCase.id,
+        lastCaseDiff: diff,
+        done: index + 1,
+        total,
+      });
+    }
+
+    return passed;
+  }
+
+  abstract generate(progress: TestGenerateOnProgress): Resolvable<T[]>;
 
   private checkOwner(): void {
     if (!this.owner) {

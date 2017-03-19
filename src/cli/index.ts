@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+import 'source-map-support/register';
+
 import * as Path from 'path';
 
 import { CLI, Shim } from 'clime';

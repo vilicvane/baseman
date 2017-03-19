@@ -8,21 +8,23 @@ import {
   Test,
   TestCase,
   TestRunner,
+  TestRunnerRunOnProgress,
 } from '..';
 
 export interface RunOptions {
   pattern: string;
-  baselineDir: string;
-  referenceDir: string;
+  baselinePath: string;
+  referencePath: string;
 }
 
 export async function run(
   dir: string,
   {
     pattern,
-    baselineDir,
-    referenceDir,
+    baselinePath,
+    referencePath,
   }: RunOptions,
+  progress: TestRunnerRunOnProgress = () => { },
 ): Promise<void> {
   let tests = (await v.call(glob, pattern, {
     cwd: dir,
@@ -42,13 +44,13 @@ export async function run(
     });
 
   let runner = new TestRunner({
-    baselineDir,
-    referenceDir,
+    baselinePath,
+    referencePath,
   });
 
   for (let test of tests) {
     runner.attach(test);
   }
 
-  await runner.run();
+  await runner.run(progress);
 }
