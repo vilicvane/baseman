@@ -66,7 +66,6 @@ export default class extends Command {
 
           doneStr = new Array(totalStr.length - doneStr.length + 1).join(' ') + doneStr;
 
-
           if (changed) {
             print(`  ${Chalk.red(`[${doneStr}/${totalStr}] × ${progress.lastCaseId}`)}`);
             print(`\n${progress.lastCaseDiff}\n`);
