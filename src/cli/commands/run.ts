@@ -30,10 +30,10 @@ export default class extends Command {
       referenceDir: REFERENCE_DIR,
     }, progress => {
       switch (progress.type) {
-        case 'start-generating':
+        case 'start-loading':
           print('Generating test cases...');
           break;
-        case 'generated':
+        case 'loaded':
           print(`Generated ${progress.total} test cases.`);
           break;
         case 'start-running':
