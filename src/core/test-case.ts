@@ -10,8 +10,8 @@ import { Resolvable } from 'villa';
 let tempEmptyDir = Tmp.dirSync().name;
 
 export interface TestCaseOwner {
-  baselinePath: string;
-  referencePath: string;
+  baselineDir: string;
+  referenceDir: string;
 }
 
 export abstract class TestCase {
@@ -23,12 +23,12 @@ export abstract class TestCase {
 
   get baselinePath(): string {
     this.checkOwner();
-    return Path.join(this.owner.baselinePath, this.id);
+    return Path.join(this.owner.baselineDir, this.id);
   }
 
   get referencePath(): string {
     this.checkOwner();
-    return Path.join(this.owner.referencePath, this.id);
+    return Path.join(this.owner.referenceDir, this.id);
   }
 
   clean(): Resolvable<void>;

@@ -8,8 +8,8 @@ import { Resolvable } from 'villa';
 import { TestCase } from './test-case';
 
 export interface TestOwner {
-  baselinePath: string;
-  referencePath: string;
+  baselineDir: string;
+  referenceDir: string;
 }
 
 export interface TestStartGeneratingProgress {
@@ -41,7 +41,7 @@ export interface TestStartRunningProgress {
 
 export interface TestRunningProgress {
   type: 'running';
-  lastCaseId: string,
+  lastCaseId: string;
   lastCaseDiff?: string;
   done: number;
   total: number;
@@ -65,14 +65,14 @@ export abstract class Test<T extends TestCase> {
     public description?: string,
   ) { }
 
-  get referencePath(): string {
+  get referenceDir(): string {
     this.checkOwner();
-    return this.owner.referencePath;
+    return this.owner.referenceDir;
   }
 
-  get baselinePath(): string {
+  get baselineDir(): string {
     this.checkOwner();
-    return this.owner.baselinePath;
+    return this.owner.baselineDir;
   }
 
   async load(progress: TestLoadOnProgress): Promise<void> {

@@ -1,6 +1,7 @@
 import * as Path from 'path';
 
 import { ExpectedError } from 'clime';
+import * as FSE from 'fs-extra';
 import * as glob from 'glob';
 import * as v from 'villa';
 
@@ -13,16 +14,16 @@ import {
 
 export interface RunOptions {
   pattern: string;
-  baselinePath: string;
-  referencePath: string;
+  baselineDir: string;
+  referenceDir: string;
 }
 
 export async function run(
   dir: string,
   {
     pattern,
-    baselinePath,
-    referencePath,
+    baselineDir,
+    referenceDir,
   }: RunOptions,
   progress: TestRunnerRunOnProgress = () => { },
 ): Promise<void> {
@@ -44,8 +45,8 @@ export async function run(
     });
 
   let runner = new TestRunner({
-    baselinePath,
-    referencePath,
+    baselineDir,
+    referenceDir,
   });
 
   for (let test of tests) {
@@ -53,4 +54,9 @@ export async function run(
   }
 
   await runner.run(progress);
+}
+
+export async function accept(referenceDir: string, baselineDir: string): Promise<void> {
+  await v.call(FSE.remove, baselineDir).catch(v.bear);
+  await v.call(FSE.move, referenceDir, baselineDir);
 }

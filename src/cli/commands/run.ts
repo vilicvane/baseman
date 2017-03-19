@@ -9,7 +9,7 @@ import {
 
 import { print } from '../../internal-util';
 import { run } from '../../util';
-import { BASELINE_PATH, REFERENCE_PATH } from '../config';
+import { BASELINE_DIR, REFERENCE_DIR } from '../config';
 
 @command({
   description: 'Run baseman tests',
@@ -26,8 +26,8 @@ export default class extends Command {
 
     await run(dir.fullName, {
       pattern: '*-test.js',
-      baselinePath: BASELINE_PATH,
-      referencePath: REFERENCE_PATH,
+      baselineDir: BASELINE_DIR,
+      referenceDir: REFERENCE_DIR,
     }, progress => {
       switch (progress.type) {
         case 'start-generating':
