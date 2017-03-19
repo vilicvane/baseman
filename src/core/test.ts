@@ -2,6 +2,7 @@ import * as FS from 'fs';
 import * as Path from 'path';
 
 import * as glob from 'glob';
+import * as minimatch from 'minimatch';
 import * as v from 'villa';
 import { Resolvable } from 'villa';
 
@@ -97,6 +98,12 @@ export abstract class Test<T extends TestCase> {
     progress({ type: 'loaded', total: cases.length });
 
     this.loaded = true;
+  }
+
+  filter(filter: string): number {
+    let total = this.cases.length;
+    this.cases = this.cases.filter(testCase => minimatch(testCase.id, filter));
+    return total - this.cases.length;
   }
 
   /**

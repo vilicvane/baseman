@@ -35,12 +35,14 @@
     "clime": "^0.5.0-dev.0",
     "fs-extra": "^2.1.2",
     "glob": "^7.1.1",
+    "minimatch": "^3.0.3",
     "source-map-support": "^0.4.14",
     "tmp": "0.0.31"
   },
   "devDependencies": {
     "@types/fs-extra": "^2.0.0",
     "@types/glob": "^5.0.30",
+    "@types/minimatch": "^2.0.29",
     "@types/node": "^7.0.5",
     "@types/tmp": "0.0.32",
     "rimraf": "^2.6.1",

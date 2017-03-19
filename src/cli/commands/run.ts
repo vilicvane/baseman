@@ -3,13 +3,23 @@ import * as Path from 'path';
 import {
   Command,
   Object as ClimeObject,
+  Options,
   command,
+  option,
   param,
 } from 'clime';
 
 import { print } from '../../internal-util';
 import { run } from '../../util';
 import { BASELINE_DIR, OUTPUT_DIR } from '../config';
+
+export class RunOptions extends Options {
+  @option({
+    description: 'A minimatch string to filter test cases by their IDs',
+    flag: 'f',
+  })
+  filter: string | undefined;
+}
 
 @command({
   description: 'Run baseman tests',
@@ -21,6 +31,8 @@ export default class extends Command {
       default: 'test/baseman',
     })
     dir: ClimeObject.Directory,
+
+    options: RunOptions,
   ) {
     await dir.assert();
 
@@ -28,13 +40,17 @@ export default class extends Command {
       pattern: '*-test.js',
       baselineDir: BASELINE_DIR,
       outputDir: OUTPUT_DIR,
+      filter: options.filter,
     }, progress => {
       switch (progress.type) {
         case 'start-loading':
-          print('Generating test cases...');
+          print('Loading test cases...');
           break;
         case 'loaded':
-          print(`Generated ${progress.total} test cases.`);
+          print(`Loaded ${progress.total} test cases.`);
+          break;
+        case 'filtered':
+          print(`Filtered ${progress.count} test cases.`);
           break;
         case 'start-running':
           print('Start running test cases...');

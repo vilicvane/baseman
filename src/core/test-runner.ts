@@ -9,12 +9,18 @@ import {
   TestRunProgress,
 } from '..';
 
-export type TestRunnerRunProgress = TestLoadProgress | TestRunProgress;
+export interface TestFilteredProgress {
+  type: 'filtered';
+  count: number;
+}
+
+export type TestRunnerRunProgress = TestLoadProgress | TestRunProgress | TestFilteredProgress;
 export type TestRunnerRunOnProgress = (progress: TestRunnerRunProgress) => void;
 
 export interface TestRunnerOptions {
   baselineDir: string;
   outputDir: string;
+  filter?: string;
 }
 
 export class TestRunner {
@@ -22,10 +28,12 @@ export class TestRunner {
   public readonly outputDir: string;
 
   private tests: Test<TestCase>[] = [];
+  private filter: string | undefined;
 
   constructor(options: TestRunnerOptions) {
     this.baselineDir = options.baselineDir;
     this.outputDir = options.outputDir;
+    this.filter = options.filter;
   }
 
   attach(test: Test<TestCase>): void {
@@ -38,6 +46,11 @@ export class TestRunner {
 
     for (let test of this.tests) {
       await test.load(progress);
+
+      if (this.filter) {
+        let count = test.filter(this.filter);
+        progress({ type: 'filtered', count });
+      }
 
       let passed = await test.run(progress);
 

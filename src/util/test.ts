@@ -16,6 +16,7 @@ export interface RunOptions {
   pattern: string;
   baselineDir: string;
   outputDir: string;
+  filter: string | undefined;
 }
 
 export async function run(
@@ -24,6 +25,7 @@ export async function run(
     pattern,
     baselineDir,
     outputDir,
+    filter,
   }: RunOptions,
   progress: TestRunnerRunOnProgress = () => { },
 ): Promise<void> {
@@ -47,6 +49,7 @@ export async function run(
   let runner = new TestRunner({
     baselineDir,
     outputDir,
+    filter,
   });
 
   for (let test of tests) {
