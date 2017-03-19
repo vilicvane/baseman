@@ -9,6 +9,8 @@ import {
   param,
 } from 'clime';
 
+import * as Tmp from 'tmp';
+
 import { print } from '../../internal-util';
 import { run } from '../../util';
 import { BASELINE_DIR, OUTPUT_DIR } from '../config';
@@ -39,7 +41,7 @@ export default class extends Command {
     await run(dir.fullName, {
       pattern: '*-test.js',
       baselineDir: BASELINE_DIR,
-      outputDir: OUTPUT_DIR,
+      outputDir: options.filter ? Tmp.dirSync().name : OUTPUT_DIR,
       filter: options.filter,
     }, progress => {
       switch (progress.type) {
