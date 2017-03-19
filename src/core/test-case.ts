@@ -11,7 +11,7 @@ let tempEmptyDir = Tmp.dirSync().name;
 
 export interface TestCaseOwner {
   baselineDir: string;
-  referenceDir: string;
+  outputDir: string;
 }
 
 export abstract class TestCase {
@@ -26,24 +26,24 @@ export abstract class TestCase {
     return Path.join(this.owner.baselineDir, this.id);
   }
 
-  get referencePath(): string {
+  get outputPath(): string {
     this.checkOwner();
-    return Path.join(this.owner.referenceDir, this.id);
+    return Path.join(this.owner.outputDir, this.id);
   }
 
   clean(): Resolvable<void>;
   async clean(): Promise<void> {
-    let referencePath = this.referencePath;
-    let stats = await v.call(FSE.stat, referencePath).catch(v.bear);
+    let outputPath = this.outputPath;
+    let stats = await v.call(FSE.stat, outputPath).catch(v.bear);
 
     if (!stats) {
       return;
     }
 
     if (stats.isFile()) {
-      await v.call(FSE.unlink, referencePath);
+      await v.call(FSE.unlink, outputPath);
     } else {
-      await v.call(FSE.remove, referencePath);
+      await v.call(FSE.remove, outputPath);
     }
   }
 
@@ -52,10 +52,10 @@ export abstract class TestCase {
   diff(): Resolvable<string | undefined>
   async diff(): Promise<string | undefined> {
     let baselinePath = this.baselinePath;
-    let referencePath = this.referencePath;
+    let outputPath = this.outputPath;
 
     let baselineStats = await v.call(FSE.stat, baselinePath).catch(v.bear);
-    let referenceStats = await v.call(FSE.stat, referencePath).catch(v.bear);
+    let referenceStats = await v.call(FSE.stat, outputPath).catch(v.bear);
 
     if (!referenceStats) {
       throw new ExpectedError(`No reference has been created by test case "${this.id}"`);
@@ -69,9 +69,9 @@ export abstract class TestCase {
       } else {
         baselinePath = tempEmptyDir + '/';
       }
-      referencePath += '/';
+      outputPath += '/';
     } else if (!baselineStats) {
-      return await v.call<string>(FSE.readFile, referencePath, 'utf-8');
+      return await v.call<string>(FSE.readFile, outputPath, 'utf-8');
     }
 
     let cp = spawn('git', [
@@ -79,7 +79,7 @@ export abstract class TestCase {
       '--no-index',
       '--color=always',
       baselinePath,
-      referencePath,
+      outputPath,
     ]);
 
     let buffers: Buffer[] = [];

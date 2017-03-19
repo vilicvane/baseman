@@ -15,7 +15,7 @@ import {
 export interface RunOptions {
   pattern: string;
   baselineDir: string;
-  referenceDir: string;
+  outputDir: string;
 }
 
 export async function run(
@@ -23,7 +23,7 @@ export async function run(
   {
     pattern,
     baselineDir,
-    referenceDir,
+    outputDir,
   }: RunOptions,
   progress: TestRunnerRunOnProgress = () => { },
 ): Promise<void> {
@@ -46,7 +46,7 @@ export async function run(
 
   let runner = new TestRunner({
     baselineDir,
-    referenceDir,
+    outputDir,
   });
 
   for (let test of tests) {
@@ -56,13 +56,13 @@ export async function run(
   await runner.run(progress);
 }
 
-export async function accept(referenceDir: string, baselineDir: string): Promise<void> {
-  let referenceStats = await v.call(FSE.stat, referenceDir).catch(v.bear);
+export async function accept(outputDir: string, baselineDir: string): Promise<void> {
+  let referenceStats = await v.call(FSE.stat, outputDir).catch(v.bear);
 
   if (!referenceStats) {
-    throw new ExpectedError(`Reference directory "${referenceDir}" does not exist`);
+    throw new ExpectedError(`Reference directory "${outputDir}" does not exist`);
   }
 
   await v.call(FSE.remove, baselineDir).catch(v.bear);
-  await v.call(FSE.move, referenceDir, baselineDir);
+  await v.call(FSE.move, outputDir, baselineDir);
 }

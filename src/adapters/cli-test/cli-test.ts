@@ -82,21 +82,21 @@ to \`true\` explicitly to suppress this error`);
       [stdout, stderr] = this.extractOutput(stdout, stderr);
     }
 
-    let referencePath = this.referencePath;
+    let outputPath = this.outputPath;
 
-    await v.call(FSE.ensureDir, referencePath);
+    await v.call(FSE.ensureDir, outputPath);
 
     if (stdout.length) {
-      let path = Path.join(referencePath, '_stdout');
+      let path = Path.join(outputPath, '_stdout');
       await v.call(FSE.writeFile, path, stdout);
     }
 
     if (stderr.length) {
-      let path = Path.join(referencePath, '_stderr');
+      let path = Path.join(outputPath, '_stderr');
       await v.call(FSE.writeFile, path, stderr);
     }
 
-    let exitCodePath = Path.join(referencePath, '_code');
+    let exitCodePath = Path.join(outputPath, '_code');
     await v.call(FSE.writeFile, exitCodePath, `0x${code.toString(16)}\n`);
 
     if (this.extractFileSystemOutput) {

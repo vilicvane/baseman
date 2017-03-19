@@ -9,7 +9,7 @@ import { TestCase } from './test-case';
 
 export interface TestOwner {
   baselineDir: string;
-  referenceDir: string;
+  outputDir: string;
 }
 
 export interface TestStartLoadingProgress {
@@ -65,9 +65,9 @@ export abstract class Test<T extends TestCase> {
     public description?: string,
   ) { }
 
-  get referenceDir(): string {
+  get outputDir(): string {
     this.checkOwner();
-    return this.owner.referenceDir;
+    return this.owner.outputDir;
   }
 
   get baselineDir(): string {

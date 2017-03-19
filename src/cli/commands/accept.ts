@@ -8,7 +8,7 @@ import {
 
 import { print } from '../../internal-util';
 import { accept } from '../../util';
-import { BASELINE_DIR, REFERENCE_DIR } from '../config';
+import { BASELINE_DIR, OUTPUT_DIR } from '../config';
 
 @command({
   description: 'Accept output in reference directory as new baseline',
@@ -16,6 +16,6 @@ import { BASELINE_DIR, REFERENCE_DIR } from '../config';
 export default class extends Command {
   @metadata
   async execute() {
-    await accept(REFERENCE_DIR, BASELINE_DIR);
+    await accept(OUTPUT_DIR, BASELINE_DIR);
   }
 }

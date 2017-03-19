@@ -14,18 +14,18 @@ export type TestRunnerRunOnProgress = (progress: TestRunnerRunProgress) => void;
 
 export interface TestRunnerOptions {
   baselineDir: string;
-  referenceDir: string;
+  outputDir: string;
 }
 
 export class TestRunner {
   public readonly baselineDir: string;
-  public readonly referenceDir: string;
+  public readonly outputDir: string;
 
   private tests: Test<TestCase>[] = [];
 
   constructor(options: TestRunnerOptions) {
     this.baselineDir = options.baselineDir;
-    this.referenceDir = options.referenceDir;
+    this.outputDir = options.outputDir;
   }
 
   attach(test: Test<TestCase>): void {

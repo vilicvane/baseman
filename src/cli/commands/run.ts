@@ -9,7 +9,7 @@ import {
 
 import { print } from '../../internal-util';
 import { run } from '../../util';
-import { BASELINE_DIR, REFERENCE_DIR } from '../config';
+import { BASELINE_DIR, OUTPUT_DIR } from '../config';
 
 @command({
   description: 'Run baseman tests',
@@ -27,7 +27,7 @@ export default class extends Command {
     await run(dir.fullName, {
       pattern: '*-test.js',
       baselineDir: BASELINE_DIR,
-      referenceDir: REFERENCE_DIR,
+      outputDir: OUTPUT_DIR,
     }, progress => {
       switch (progress.type) {
         case 'start-loading':
