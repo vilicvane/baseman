@@ -123,7 +123,7 @@ export abstract class CLITest extends Test<CLITestCase> {
 
   constructor(
     public executable: string,
-    { precedingArgs, description }: CLITestOptions,
+    { precedingArgs, description }: CLITestOptions = {},
   ) {
     super(description);
     this.precedingArgs = precedingArgs ? precedingArgs.concat() : [];
