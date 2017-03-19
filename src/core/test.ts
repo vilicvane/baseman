@@ -17,8 +17,12 @@ export interface TestStartLoadingProgress {
   type: 'start-loading';
 }
 
-export interface TestLoadingProgress {
-  type: 'loading';
+export interface TestStartGeneratingProgress {
+  type: 'start-generating';
+}
+
+export interface TestGeneratingProgress {
+  type: 'generating';
   done: number;
   total: number;
 }
@@ -30,7 +34,8 @@ export interface TestLoadedProgress {
 
 export type TestLoadProgress =
   TestStartLoadingProgress |
-  TestLoadingProgress |
+  TestStartGeneratingProgress |
+  TestGeneratingProgress |
   TestLoadedProgress;
 
 export type TestLoadOnProgress = (progress: TestLoadProgress) => void;
@@ -82,9 +87,10 @@ export abstract class Test<T extends TestCase> {
     }
 
     progress({ type: 'start-loading' });
+    progress({ type: 'start-generating' });
 
     let cases = await this.generate((done, total) => progress({
-      type: 'loading',
+      type: 'generating',
       done,
       total,
     }));
