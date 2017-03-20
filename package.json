@@ -1,6 +1,6 @@
 {
   "name": "baseman",
-  "version": "0.1.0-dev.3",
+  "version": "0.1.0-dev.4",
   "description": "Integration testing framework for Node.js",
   "main": "bld/index.js",
   "typings": "bld/index.d.ts",
