@@ -11,7 +11,7 @@ import { TestCase } from './test-case';
 
 export interface TestOwner {
   baselineDir: string;
-  outputDir: string;
+  tempOutputDir: string;
 }
 
 export interface TestStartLoadingProgress {
@@ -74,7 +74,7 @@ export abstract class Test<T extends TestCase> {
 
   get outputDir(): string {
     this.checkOwner();
-    return this.owner.outputDir;
+    return this.owner.tempOutputDir;
   }
 
   get baselineDir(): string {
@@ -131,12 +131,13 @@ export abstract class Test<T extends TestCase> {
     let cases = this.cases;
     let total = cases.length;
 
-    progress({ type: 'start-running', total });
+    if (total) {
+      progress({ type: 'start-running', total });
+    }
 
     let passed = true;
 
     for (let [index, testCase] of cases.entries()) {
-      await testCase.clean();
       await testCase.test();
 
       let diff = await testCase.diff();

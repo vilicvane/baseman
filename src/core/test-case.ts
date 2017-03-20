@@ -31,6 +31,7 @@ export abstract class TestCase {
     return Path.join(this.owner.outputDir, this.id);
   }
 
+  // TODO: not used after changing output dir creation strategy.
   clean(): Resolvable<void>;
   async clean(): Promise<void> {
     let outputPath = this.outputPath;

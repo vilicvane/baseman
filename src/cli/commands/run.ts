@@ -42,7 +42,7 @@ export default class extends Command {
     await run(dir.fullName, {
       pattern: '*-test.js',
       baselineDir: BASELINE_DIR,
-      outputDir: options.filter ? Tmp.dirSync().name : OUTPUT_DIR,
+      outputDir: OUTPUT_DIR,
       filter: options.filter,
     }, progress => {
       switch (progress.type) {

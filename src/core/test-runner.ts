@@ -1,6 +1,9 @@
 import * as Path from 'path';
 
 import { ExpectedError } from 'clime';
+import * as FSE from 'fs-extra';
+import * as Tmp from 'tmp';
+import * as v from 'villa';
 
 import {
   Test,
@@ -34,8 +37,9 @@ export interface TestRunnerOptions {
 
 export class TestRunner {
   public readonly baselineDir: string;
-  public readonly outputDir: string;
+  public readonly tempOutputDir = Tmp.dirSync().name;
 
+  private outputDir: string;
   private tests: Test<TestCase>[] = [];
   private filter: string | undefined;
 
@@ -66,6 +70,11 @@ export class TestRunner {
       if (!changed && !passed) {
         changed = true;
       }
+    }
+
+    if (!this.filter) {
+      await v.call(FSE.remove, this.outputDir).catch(v.bear);
+      await v.call(FSE.move, this.tempOutputDir, this.outputDir);
     }
 
     progress({ type: 'completed' });
