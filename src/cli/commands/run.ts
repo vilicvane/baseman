@@ -66,11 +66,17 @@ export default class extends Command {
 
           doneStr = new Array(totalStr.length - doneStr.length + 1).join(' ') + doneStr;
 
+          let progressStr = `[${doneStr}/${totalStr}]`;
+          let lastCase = progress.lastCase;
+
           if (changed) {
-            print(`  ${Chalk.red(`[${doneStr}/${totalStr}] × ${progress.lastCaseId}`)}`);
-            print(`\n${progress.lastCaseDiff}\n`);
+            let description = lastCase.description;
+            print(`\
+  ${Chalk.red(`${progressStr} × ${lastCase.id}`)}
+${description ? `\n${Chalk.yellow(description)}\n` : ''}
+${progress.lastCaseDiff}`);
           } else {
-            print(`  ${Chalk.gray(`[${doneStr}/${totalStr}]`)} ${Chalk.green('√')} ${progress.lastCaseId}`);
+            print(`  ${Chalk.gray(`${progressStr}`)} ${Chalk.green('√')} ${lastCase.id}`);
           }
 
           break;

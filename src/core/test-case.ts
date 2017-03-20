@@ -16,6 +16,7 @@ export interface TestCaseOwner {
 
 export abstract class TestCase {
   owner: TestCaseOwner;
+  readonly description: string | undefined;
 
   constructor(
     public readonly id: string,

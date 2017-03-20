@@ -48,7 +48,7 @@ export interface TestStartRunningProgress {
 
 export interface TestRunningProgress {
   type: 'running';
-  lastCaseId: string;
+  lastCase: TestCase;
   lastCaseDiff?: string;
   done: number;
   total: number;
@@ -148,7 +148,7 @@ export abstract class Test<T extends TestCase> {
 
       progress({
         type: 'running',
-        lastCaseId: testCase.id,
+        lastCase: testCase,
         lastCaseDiff: diff,
         done: index + 1,
         total,

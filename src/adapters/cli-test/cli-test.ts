@@ -52,6 +52,11 @@ export class CLITestCase extends TestCase {
     this.dir = dir;
   }
 
+  get description(): string {
+    let argsStr = this.args.map(arg => JSON.stringify(arg)).join(' ');
+    return `args ${argsStr}`;
+  }
+
   async test(): Promise<void> {
     if (!this.allowNonEmptyCWD && !await isDirEmpty(this.cwd)) {
       throw new ExpectedError(`Working directory "${this.cwd}" is not empty, set \`allowNonEmptyCWD\` option \
