@@ -1,6 +1,7 @@
 import * as FS from 'fs';
 import * as Path from 'path';
 
+import { ExpectedError } from 'clime';
 import * as glob from 'glob';
 import * as minimatch from 'minimatch';
 import * as v from 'villa';
@@ -95,8 +96,15 @@ export abstract class Test<T extends TestCase> {
       total,
     }));
 
+    let caseNameSet = new Set<string>();
+
     for (let testCase of cases) {
+      if (caseNameSet.has(testCase.id)) {
+        throw new ExpectedError(`Duplicate test case ID "${testCase.id}"`);
+      }
+
       testCase.owner = this;
+      caseNameSet.add(testCase.id);
     }
 
     this.cases = cases;
