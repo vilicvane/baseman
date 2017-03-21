@@ -35,18 +35,7 @@ export abstract class TestCase {
   // TODO: not used after changing output dir creation strategy.
   clean(): Resolvable<void>;
   async clean(): Promise<void> {
-    let outputPath = this.outputPath;
-    let stats = await v.call(FSE.stat, outputPath).catch(v.bear);
-
-    if (!stats) {
-      return;
-    }
-
-    if (stats.isFile()) {
-      await v.call(FSE.unlink, outputPath);
-    } else {
-      await v.call(FSE.remove, outputPath);
-    }
+    await v.call(FSE.remove, this.outputPath);
   }
 
   abstract test(): Resolvable<void>;
