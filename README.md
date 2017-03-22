@@ -21,7 +21,7 @@ npm install baseman --save-dev
 
 ## Usage
 
-```sh
+```
 USAGE
 
   baseman <subcommand>
@@ -32,7 +32,7 @@ SUBCOMMANDS
   accept - Accept output in reference directory as new baseline
 ```
 
-```sh
+```
 USAGE
 
   baseman run [dir=test/baseman] [...options]
