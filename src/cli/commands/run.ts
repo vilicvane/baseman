@@ -102,6 +102,7 @@ ${progress.lastCaseDiff}`);
 export default class extends Command {
   async execute(
     @param({
+      name: 'dir',
       description: 'The directory that contains tests',
       default: 'test/baseman',
     })
