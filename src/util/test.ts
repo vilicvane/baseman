@@ -4,10 +4,12 @@ import { ExpectedError } from 'clime';
 import * as FSE from 'fs-extra';
 import * as glob from 'glob';
 import * as v from 'villa';
+import { Resolvable } from 'villa';
 
 import {
   Test,
   TestCase,
+  TestRunOnCaseOutputChanged,
   TestRunner,
   TestRunnerRunOnProgress,
 } from '..';
@@ -16,7 +18,7 @@ export interface RunOptions {
   pattern: string;
   baselineDir: string;
   outputDir: string;
-  filter: string | undefined;
+  filter?: string;
 }
 
 export async function run(
@@ -27,7 +29,8 @@ export async function run(
     outputDir,
     filter,
   }: RunOptions,
-  progress: TestRunnerRunOnProgress = () => { },
+  progressHandler: TestRunnerRunOnProgress = () => { },
+  caseOutputChangedHandler?: TestRunOnCaseOutputChanged,
 ): Promise<void> {
   let tests = (await v.call(glob, pattern, {
     cwd: dir,
@@ -56,7 +59,7 @@ export async function run(
     runner.attach(test);
   }
 
-  await runner.run(progress);
+  await runner.run(progressHandler, caseOutputChangedHandler);
 }
 
 export async function accept(outputDir: string, baselineDir: string): Promise<void> {

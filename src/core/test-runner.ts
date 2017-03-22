@@ -4,11 +4,13 @@ import { ExpectedError } from 'clime';
 import * as FSE from 'fs-extra';
 import * as Tmp from 'tmp';
 import * as v from 'villa';
+import { Resolvable } from 'villa';
 
 import {
   Test,
   TestCase,
   TestLoadProgress,
+  TestRunOnCaseOutputChanged,
   TestRunProgress,
 } from '..';
 
@@ -54,18 +56,21 @@ export class TestRunner {
     this.tests.push(test);
   }
 
-  async run(progress: TestRunnerRunOnProgress): Promise<void> {
+  async run(
+    progressHandler: TestRunnerRunOnProgress,
+    caseOutputChangedHandler?: TestRunOnCaseOutputChanged,
+  ): Promise<void> {
     let changed = false;
 
     for (let test of this.tests) {
-      await test.load(progress);
+      await test.load(progressHandler);
 
       if (this.filter) {
         let count = test.filter(this.filter);
-        progress({ type: 'filtered', count });
+        progressHandler({ type: 'filtered', count });
       }
 
-      let passed = await test.run(progress);
+      let passed = await test.run(progressHandler, caseOutputChangedHandler);
 
       if (!changed && !passed) {
         changed = true;
@@ -77,10 +82,14 @@ export class TestRunner {
       await v.call(FSE.move, this.tempOutputDir, this.outputDir);
     }
 
-    progress({ type: 'completed' });
+    progressHandler({ type: 'completed' });
 
     if (changed) {
-      throw new ExpectedError('Output has changed, run `baseman accept` to accept the new output as baseline');
+      if (this.filter) {
+        throw new ExpectedError('Output has changed');
+      } else {
+        throw new ExpectedError('Output has changed, run `baseman accept` to accept the new output as baseline');
+      }
     }
   }
 }

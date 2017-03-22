@@ -87,6 +87,11 @@ export abstract class TestCase {
     }
   }
 
+  async accept(): Promise<void> {
+    await v.call(FSE.remove, this.baselinePath);
+    await v.call(FSE.copy, this.outputPath, this.baselinePath);
+  }
+
   private checkOwner(): void {
     if (!this.owner) {
       throw new Error(`Test case "${this.id}" has not been added to a test`);

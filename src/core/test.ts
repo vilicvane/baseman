@@ -62,6 +62,12 @@ export type TestRunOnProgress = (progress: TestRunProgress) => void;
 
 export type TestGenerateOnProgress = (done: number, total: number) => void;
 
+export type TestRunOnCaseOutputChanged = (testCase: TestCase) => Resolvable<void>;
+
+export interface TestRunOptions {
+  caseOutputChangedHandler?: TestRunOnCaseOutputChanged;
+}
+
 export abstract class Test<T extends TestCase> {
   owner: TestOwner;
 
@@ -123,7 +129,10 @@ export abstract class Test<T extends TestCase> {
   /**
    * @returns A boolean indicates whether this test passes.
    */
-  async run(progress: TestRunOnProgress): Promise<boolean> {
+  async run(
+    progressHandler: TestRunOnProgress,
+    caseOutputChangedHandler?: TestRunOnCaseOutputChanged,
+  ): Promise<boolean> {
     if (!this.loaded) {
       throw new Error('Test has not yet been loaded');
     }
@@ -132,7 +141,7 @@ export abstract class Test<T extends TestCase> {
     let total = cases.length;
 
     if (total) {
-      progress({ type: 'start-running', total });
+      progressHandler({ type: 'start-running', total });
     }
 
     let passed = true;
@@ -142,17 +151,23 @@ export abstract class Test<T extends TestCase> {
 
       let diff = await testCase.diff();
 
-      if (passed && diff !== undefined) {
-        passed = false;
-      }
-
-      progress({
+      progressHandler({
         type: 'running',
         lastCase: testCase,
         lastCaseDiff: diff,
         done: index + 1,
         total,
       });
+
+      if (diff !== undefined) {
+        if (passed) {
+          passed = false;
+        }
+
+        if (caseOutputChangedHandler) {
+          await caseOutputChangedHandler(testCase);
+        }
+      }
     }
 
     return passed;
