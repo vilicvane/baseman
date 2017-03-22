@@ -10,6 +10,8 @@ The latest version of [clime](https://github.com/vilic/clime) (the command-line 
 - [Accepted baseline](https://github.com/vilic/clime/tree/master/test/baseman/baseline)
 - [Travis CI](https://travis-ci.org/vilic/clime)
 
+And yes, baseman is using clime for command-line interface.
+
 ## Installation
 
 ```sh
