@@ -7,6 +7,9 @@ import * as Tmp from 'tmp';
 import * as v from 'villa';
 import { Resolvable } from 'villa';
 
+// tslint:disable-next-line:max-line-length
+const DIFF_OUTPUT_REGEX = /^(?:\x1b\[\d+m)?diff --git [^\n\x1b]+(?:\x1b\[m)?\n(?:(?:\x1b\[\d+m)?(?!index )[^\n\x1b]+(?:\x1b\[m)?\n)*(?:\x1b\[\d+m)?index [\da-f]{7}..[\da-f]{7}(?:\x1b\[m)?\n(?:\x1b\[\d+m)?--- ([^\n\x1b]+)(?:\x1b\[m)?\n(?:\x1b\[\d+m)?\+\+\+ ([^\n\x1b]+)(?:\x1b\[m)?/mg;
+
 let tempEmptyDir = Tmp.dirSync().name;
 
 export interface TestCaseOwner {
@@ -83,7 +86,18 @@ export abstract class TestCase {
     let code = await v.awaitable<number>(cp, 'exit');
 
     if (code) {
-      return Buffer.concat(buffers).toString();
+      return Buffer
+        .concat(buffers)
+        .toString()
+        .replace(DIFF_OUTPUT_REGEX, (text, src: string, dist: string) => {
+          dist = dist.replace(/^"|"$/g, '');
+
+          if (!Path.isAbsolute(dist)) {
+            dist = `/${dist}`;
+          }
+
+          return `diff "${Path.relative(this.owner.outputDir, dist)}"`;
+        });
     } else {
       return undefined;
     }
