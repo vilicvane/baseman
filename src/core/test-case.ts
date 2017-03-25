@@ -68,8 +68,10 @@ export abstract class TestCase {
     let cp = spawn('git', [
       'diff',
       '--no-index',
+      '--no-prefix',
       '--color',
       '--minimal',
+      '--unified=1024',
       baselinePath,
       outputPath,
     ]);
