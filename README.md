@@ -29,7 +29,7 @@ USAGE
 SUBCOMMANDS
 
   run    - Run baseman tests
-  accept - Accept output in reference directory as new baseline
+  accept - Accept new output as baseline
 ```
 
 ```
