@@ -11,7 +11,7 @@ import { accept } from '../../util';
 import { BASELINE_DIR, OUTPUT_DIR } from '../config';
 
 @command({
-  description: 'Accept output in reference directory as new baseline',
+  description: 'Accept new output as baseline',
 })
 export default class extends Command {
   @metadata
