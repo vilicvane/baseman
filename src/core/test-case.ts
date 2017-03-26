@@ -1,6 +1,7 @@
 import { spawn } from 'child_process';
 import * as Path from 'path';
 
+import * as Chalk from 'chalk';
 import { ExpectedError } from 'clime';
 import * as FSE from 'fs-extra';
 import * as Tmp from 'tmp';
@@ -8,7 +9,7 @@ import * as v from 'villa';
 import { Resolvable } from 'villa';
 
 // tslint:disable-next-line:max-line-length
-const DIFF_OUTPUT_REGEX = /^(?:\x1b\[\d+m)?diff --git [^\n\x1b]+(?:\x1b\[m)?\n(?:(?:\x1b\[\d+m)?(?!index )[^\n\x1b]+(?:\x1b\[m)?\n)*(?:\x1b\[\d+m)?index [\da-f]{7}..[\da-f]{7}(?:\x1b\[m)?\n(?:\x1b\[\d+m)?--- ([^\n\x1b]+)(?:\x1b\[m)?\n(?:\x1b\[\d+m)?\+\+\+ ([^\n\x1b]+)(?:\x1b\[m)?/mg;
+const DIFF_OUTPUT_REGEX = /^diff --git .+\n(?:(?!index ).+\n)*index [\da-f]{7}..[\da-f]{7}(?: .+)?\n--- (.+)\n\+\+\+ (.+)\n(@@.+@@)/mg;
 
 let tempEmptyDir = Tmp.dirSync().name;
 
@@ -72,7 +73,7 @@ export abstract class TestCase {
       'diff',
       '--no-index',
       '--no-prefix',
-      '--color',
+      '--color=never',
       '--minimal',
       '--unified=1024',
       baselinePath,
@@ -89,14 +90,22 @@ export abstract class TestCase {
       return Buffer
         .concat(buffers)
         .toString()
-        .replace(DIFF_OUTPUT_REGEX, (text, src: string, dist: string) => {
+        .replace(DIFF_OUTPUT_REGEX, (text, src: string, dist: string, summary: string) => {
           dist = dist.replace(/^"|"$/g, '');
 
           if (!Path.isAbsolute(dist)) {
             dist = `/${dist}`;
           }
 
-          return `diff "${Path.relative(this.owner.outputDir, dist)}"`;
+          return `diff "${Path.relative(this.owner.outputDir, dist)}"\n${Chalk.cyan(summary)}`;
+        })
+        .replace(/^([+-\\]).+/mg, (line, sign: string) => {
+          if (sign === '\\') {
+            return Chalk.gray(line);
+          }
+
+          line = line.replace(/\s+$/, Chalk.bgRed('$&'));
+          return sign === '+' ? Chalk.green(line) : Chalk.red(line);
         });
     } else {
       return undefined;
