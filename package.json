@@ -11,8 +11,7 @@
     "tsc": "tsc",
     "tslint": "tslint",
     "lint": "tslint src/**/*.ts -c tslint.json",
-    "build": "npm run lint && rimraf bld && tsc",
-    "prepublish": "npm run build"
+    "build": "npm run lint && rimraf bld && tsc"
   },
   "repository": {
     "type": "git",
