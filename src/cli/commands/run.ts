@@ -15,7 +15,7 @@ import { prompt } from 'inquirer';
 import * as Tmp from 'tmp';
 
 import { print } from '../../internal-util';
-import { run } from '../../util';
+import { run } from '../../lib';
 import { BASELINE_DIR, OUTPUT_DIR } from '../config';
 
 import {

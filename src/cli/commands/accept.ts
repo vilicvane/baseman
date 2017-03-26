@@ -7,7 +7,7 @@ import {
 } from 'clime';
 
 import { print } from '../../internal-util';
-import { accept } from '../../util';
+import { accept } from '../../lib';
 import { BASELINE_DIR, OUTPUT_DIR } from '../config';
 
 @command({
