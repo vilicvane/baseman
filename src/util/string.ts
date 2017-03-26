@@ -1,7 +1,7 @@
 import * as FS from 'fs';
 import * as Path from 'path';
 
-const errorStackRegex = /^([A-Z]\w*Error(?:: .+)?)\n(?: {4}at .+\n)+/mg;
+const errorStackRegex = /^((?:[A-Z]\w*)?Error(?:: .+)?)\n(?: {4}at .+\n)+/mg;
 
 export function blurErrorStack(output: string): string {
   return output.replace(errorStackRegex, '$1\n    [stack]');
