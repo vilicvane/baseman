@@ -1,3 +1,5 @@
+> Depracated in favor of [Jest](https://jestjs.io/) snapshot testing.
+
 # Baseman Testing Framework
 
 **Currently under development**
